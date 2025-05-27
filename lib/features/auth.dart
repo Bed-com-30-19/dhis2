@@ -8,11 +8,13 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final _serverUrlController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   bool get _isFormFilled =>
+      _serverUrlController.text.isNotEmpty &&
       _usernameController.text.isNotEmpty &&
       _passwordController.text.isNotEmpty;
 
@@ -21,73 +23,60 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              color: Colors.blue[700],
-              padding: EdgeInsets.symmetric(vertical: 24),
-              width: double.infinity,
-              child: Column(
-                children: [
-                  Icon(Icons.apps, size: 48, color: Colors.white),
-                  Text("dhis2", style: TextStyle(color: Colors.white, fontSize: 24)),
-                  Text("v3.1.1.1 : d496710a2", style: TextStyle(color: Colors.white70)),
-                ],
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Align(
+                alignment: Alignment.topRight,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Icon(Icons.apps, size: 48, color: Colors.blue),
+                    Text("dhis2", style: TextStyle(color: Colors.blue, fontSize: 24)),
+                    Text("v3.1.1.1 : d496710a2", style: TextStyle(color: Colors.blueGrey)),
+                  ],
+                ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(24),
-              child: Column(
-                children: [
-                  _buildReadOnlyField("https://project.ccdev.org/ictproject"),
-                  SizedBox(height: 16),
-                  _buildTextField("Username", _usernameController, Icons.person),
-                  SizedBox(height: 16),
-                  _buildPasswordField(),
-                  SizedBox(height: 8),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        // Handle account recovery
-                      },
-                      child: Text("Account recovery"),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _isFormFilled ? () {
-                      // Handle login
-                    } : null,
-                    child: Text("LOG IN"),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: Size(double.infinity, 48),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextButton(
-                    onPressed: () {
-                      // Handle manage accounts
-                    },
-                    child: Text("Manage Accounts"),
-                  )
-                ],
+              SizedBox(height: 40),
+              _buildTextField("Server url", _serverUrlController, Icons.link),
+              SizedBox(height: 16),
+              _buildTextField("Username", _usernameController, Icons.person),
+              SizedBox(height: 16),
+              _buildPasswordField(),
+              SizedBox(height: 16),
+              Center(
+                child: TextButton(
+                  onPressed: () {
+                    // handle account recovery
+                  },
+                  child: Text("Account recovery"),
+                ),
               ),
-            ),
-          ],
+              SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: _isFormFilled ? () {} : null,
+                child: Text("LOG IN"),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(double.infinity, 48), // full width square
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
+                  ),
+                ),
+              ),
+              SizedBox(height: 12),
+              Center(
+                child: TextButton(
+                  onPressed: () {
+                    // handle manage accounts
+                  },
+                  child: Text("Manage Accounts"),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildReadOnlyField(String value) {
-    return TextField(
-      controller: TextEditingController(text: value),
-      readOnly: true,
-      decoration: InputDecoration(
-        labelText: "Server url",
-        prefixIcon: Icon(Icons.link),
-        border: OutlineInputBorder(),
       ),
     );
   }
@@ -97,9 +86,12 @@ class _LoginScreenState extends State<LoginScreen> {
       controller: controller,
       onChanged: (_) => setState(() {}),
       decoration: InputDecoration(
-        labelText: label,
+        hintText: label,
         prefixIcon: Icon(icon),
-        border: OutlineInputBorder(),
+        border: InputBorder.none, // removes border
+        filled: true,
+        fillColor: Colors.grey[100],
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
     );
   }
@@ -110,16 +102,16 @@ class _LoginScreenState extends State<LoginScreen> {
       obscureText: _obscurePassword,
       onChanged: (_) => setState(() {}),
       decoration: InputDecoration(
-        labelText: "Password",
+        hintText: "Password",
         prefixIcon: Icon(Icons.lock),
         suffixIcon: IconButton(
-          icon: Icon(
-              _obscurePassword ? Icons.visibility_off : Icons.visibility),
-          onPressed: () => setState(() {
-            _obscurePassword = !_obscurePassword;
-          }),
+          icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
+          onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
         ),
-        border: OutlineInputBorder(),
+        border: InputBorder.none,
+        filled: true,
+        fillColor: Colors.grey[100],
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
     );
   }
