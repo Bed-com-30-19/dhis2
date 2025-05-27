@@ -1,0 +1,2 @@
+F:/Track Wise App/trackwise/android/app/.cxx/Debug/6b4a6d63/x86/CMakeFiles/edit_cache.dir
+F:/Track Wise App/trackwise/android/app/.cxx/Debug/6b4a6d63/x86/CMakeFiles/rebuild_cache.dir
