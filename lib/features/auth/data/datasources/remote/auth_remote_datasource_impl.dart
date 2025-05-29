@@ -1,64 +1,73 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import '../../../auth_library.dart';
 import 'dart:convert';
+import '../../../auth_library.dart';
+
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  final http.Client client;
+  
 
-  AuthRemoteDataSourceImpl({required this.client});
+  AuthRemoteDataSourceImpl();
 
   @override
-  Future<String> login(AuthModel authModel) async {
+  Future<Map<String, dynamic>> login(String baseUrl, String username, String password) async {
     try {
+      final String basicAuth = 'Basic ${base64Encode(utf8.encode('$username:$password'))}';
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/me'),
+        headers: {
+          'Authorization': basicAuth,
+          'Content-Type': 'application/json',
+        },
+      ).timeout(const Duration(seconds: 10));
 
-      final response = await client.post(
-        Uri.parse('https://project.ccdev.org/ictprojects/api/me'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(authModel.toJson()),
-      );
-
-      final responseBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
-
-        String token = responseData['token'];
+        final responseBody = jsonDecode(response.body);
+        final userId = responseBody['id'];
         
-        return token;
-
-      } else if (response.statusCode == 401) {
-
-        throw Exception(responseBody['message'] ?? 'Invalid username or password. Please try again.');
-      } else if (response.statusCode == 500) {
-
-        throw Exception(responseBody['message'] ?? 'Server error. Please try again later.');
+        return {
+          'token': basicAuth,
+          'baseUrl': baseUrl,
+          'userId': userId,
+        };
       } else {
-
-        throw Exception(responseBody['message'] ?? 'Something went wrong. Please try again.');
+        throw _handleErrorResponse(response);
       }
     } on SocketException {
-
-      throw Exception('No Internet connection. Please check your network and try again.');
+      throw const AuthException('No Internet connection');
     } on TimeoutException {
-
-      throw Exception('Request timed out. Please try again.');
+      throw const AuthException('Request timed out');
     } catch (e) {
-      rethrow;
+      throw AuthException(e.toString());
+    }
+  }
+
+  Exception _handleErrorResponse(http.Response response) {
+    final statusCode = response.statusCode;
+    final responseBody = jsonDecode(response.body);
+    final message = responseBody['message'] ?? 'Authentication failed';
+
+    switch (statusCode) {
+      case 401: return const AuthException('Invalid credentials');
+      case 403: return const AuthException('Access denied');
+      case 500: return const AuthException('Server error');
+      default: return AuthException('$message (Status: $statusCode)');
     }
   }
 
   @override
-  Future<void> logout(String token) async {
-    final response = await client.post(
-      Uri.parse('/logout'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
-
-    if (response.statusCode != 200) {
-      throw Exception('Logout failed');
-    }
+  Future<void> logout() async {
+    // No server-side logout needed for Basic Auth
+    return Future.value();
   }
+}
 
+class AuthException implements Exception {
+  final String message;
+  const AuthException(this.message);
+
+  @override
+  String toString() => 'AuthException: $message';
 }

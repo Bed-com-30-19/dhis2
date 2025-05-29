@@ -8,24 +8,33 @@ class AuthRepositoryImpl implements AuthRepository {
     required this.remoteDataSource,
     required this.localDataSource,
   });
-  
-  @override
-  Future<void> login(AuthEntity entity) async {
-    final authModel = AuthModel.fromEntity(entity);
 
-    final token = await remoteDataSource.login(authModel);
-
-    return localDataSource.saveToken(token);
-    
-  }
-  
   @override
-  Future<void> logout() async {
-    final token = await localDataSource.getToken();
-    if (token != null) {
-      await remoteDataSource.logout(token);
-      await localDataSource.clearToken();
+  Future<bool> login(String baseUrl, String username, String password) async {
+    final authData = await remoteDataSource.login(baseUrl, username, password);
+    await localDataSource.saveAuthData(
+      authData['token']!,
+      authData['baseUrl']!,
+      authData['userId']!,
+    );
+    if(authData.isNotEmpty){
+      return true;
+    } else{
+      return false;
     }
   }
-  
+
+  @override
+  Future<void> logout() async {
+    await localDataSource.clearAuthData();
+    await remoteDataSource.logout();
+  }
+
+  @override
+  Future<bool> isAuthenticated() async {
+    final authData = await localDataSource.getAuthData();
+    return authData['token'] != null && 
+           authData['baseUrl'] != null && 
+           authData['userId'] != null;
+  }
 }

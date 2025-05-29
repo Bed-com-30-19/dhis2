@@ -1,12 +1,23 @@
-import '../../auth_library.dart';
+// import 'package:trackwise/features/auth/domain/repositories/auth_repository_impl.dart';
 
-class LoginUseCase {
-  final AuthRepositoryImpl repository;
+// import '../../auth_library.dart' show AuthEntity;
 
-  LoginUseCase(this.repository);
+// class LoginUseCase {
+//   final AuthRepositoryImpl repository;
 
-  Future<void> execute(AuthEntity entity) async {
-    
-    return await repository.login(entity);
-  }
-}
+//   LoginUseCase(this.repository);
+
+//   Future<AuthResponse> execute(AuthEntity authEntity) async {
+//     return await repository.login(authEntity);
+//   }
+// }
+
+// class LogoutUseCase {
+//   final AuthRepository repository;
+
+//   LogoutUseCase(this.repository);
+
+//   Future<void> execute() async {
+//     await repository.logout();
+//   }
+// }

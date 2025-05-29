@@ -22,7 +22,7 @@ class AuthModel extends Equatable {
 
   factory AuthModel.fromEntity(AuthEntity entity) {
     return AuthModel(
-      url: entity.url,
+      url: entity.baseUrl,
       username: entity.username,
       password: entity.password,
     );

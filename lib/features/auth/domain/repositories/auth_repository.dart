@@ -1,6 +1,6 @@
-import '../../auth_library.dart';
 
 abstract class AuthRepository {
-  Future<void> login(AuthEntity entity);
+  Future<bool> login(String baseUrl, String username, String password);
   Future<void> logout();
+  Future<bool> isAuthenticated();
 }

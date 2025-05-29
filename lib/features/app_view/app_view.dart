@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:trackwise/features/home_page/screens/home_screen.dart';
+import '../auth/auth_library.dart';
+//import 'package:trackwise/features/mapping_service/patient-screening_screen.dart';
+//import 'package:trackwise/lib/pages/login_screen.dart';
 
-import '../programs/screen/program_screen.dart';
 
 class AppView extends StatelessWidget {
   const AppView({super.key});
@@ -8,10 +11,18 @@ class AppView extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ProgramScreen(personId: "personId"),
+      home: LoginScreen(),
       routes: {
-          
-        },
+        '/home-page': (context) => const HomeScreen(),
+          // '/import-file': (context) => const ImportExcelFileScreen(),
+          // '/attendance': (context) => const AttendanceScreen(),
+          // '/examination': (context) => const ExaminationScreen(),
+          // '/managerial-dashboard': (context) => const ManagerialDashboard(),
+          // '/invigilation-dashboard': (context) => const InvigilationDashboard(),
+          // '/qrcode-scanner': (context) => const QRCodeScannerScreen(),
+          // '/select-attendance-method': (context) => SelectAttendanceMethodScreen(),
+          // '/use-old-data': (context) => UseOldDataScreen(), 
+      },
     );
   }
 }

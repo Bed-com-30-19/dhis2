@@ -11,11 +11,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  
-  final _urlController = TextEditingController();
+  final _urlController = TextEditingController(text: 'https://project.ccdev.org/ictprojects');
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-
   bool _obscurePassword = true;
 
   bool get _isFormFilled =>
@@ -38,60 +36,86 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Colors.blue[700],
                   padding: const EdgeInsets.symmetric(vertical: 24),
                   width: double.infinity,
-                  child: const Column(
+                  child: Column(
                     children: [
-                      Icon(Icons.apps, size: 48, color: Colors.white),
-                      Text("dhis2", style: TextStyle(color: Colors.white, fontSize: 24)),
-                      Text("v3.1.1.1 : d496710a2", style: TextStyle(color: Colors.white70)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.apps, size: 48, color: Colors.white),
+                          SizedBox(width: 8),
+                          Text("dhis2", style: TextStyle(color: Colors.white, fontSize: 24)),
+                        ],
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 24.0, top: 8.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text("v3.1.1.1 : d496710a2", style: TextStyle(color: Colors.white70)),
+                        ),
+                      ),
                     ],
+                  ),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      children: [
+                        _buildTextField("Server URL", _urlController, Icons.link),
+                        const SizedBox(height: 16),
+                        _buildTextField("Username", _usernameController, Icons.person),
+                        const SizedBox(height: 16),
+                        _buildPasswordField(),
+                        const SizedBox(height: 8),
+                        Center(
+                          child: TextButton(
+                            onPressed: () {
+                              // Handle account recovery
+                            },
+                            child: const Text(
+                              "Account recovery",
+                              style: TextStyle(color: Colors.blue),
+                            ),
+                          ),
+                        ),
+                        if (viewModel.errorMessage != null) 
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              viewModel.errorMessage!,
+                              style: const TextStyle(color: Colors.red),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(24),
                   child: Column(
                     children: [
-                      _buildTextField("URL", _urlController, Icons.person),
-                      const SizedBox(height: 16),
-                      _buildTextField("Username", _usernameController, Icons.person),
-                      const SizedBox(height: 16),
-                      _buildPasswordField(),
-                      const SizedBox(height: 8),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {
-                            // Handle account recovery
-                          },
-                          child: const Text("Account recovery"),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: _isFormFilled && !viewModel.isLoading
-                            ? () async {
-                                await viewModel.login(
-                                  _urlController.text,
-                                  _usernameController.text,
-                                  _passwordController.text,
-                                  (error) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text(error)),
-                                    );
-                                  },
-                                );
-                              }
+                            ? () => _handleLogin(viewModel)
                             : null,
                         style: ElevatedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 48),
+                          backgroundColor: _isFormFilled ? Colors.blue : null,
+                          minimumSize: const Size(double.infinity, 40),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.zero,
+                          ),
                         ),
                         child: const Text("LOG IN"),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 8),
                       TextButton(
                         onPressed: () {
-                          // Handle manage accounts
+                          Navigator.pushReplacementNamed(context, '/home-page');
                         },
-                        child: const Text("Manage Accounts"),
+                        child: const Text(
+                          "Manage Accounts",
+                          style: TextStyle(color: Colors.blue),
+                        ),
                       ),
                     ],
                   ),
@@ -107,38 +131,85 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
-
   }
 
   Widget _buildTextField(String label, TextEditingController controller, IconData icon) {
-    return TextField(
-      controller: controller,
-      onChanged: (_) => setState(() {}),
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon),
-        border: OutlineInputBorder(),
-      ),
+    return Row(
+      children: [
+        Icon(icon, color: Colors.grey),
+        const SizedBox(width: 8),
+        Expanded(
+          child: TextField(
+            controller: controller,
+            onChanged: (_) => setState(() {}),
+            decoration: InputDecoration(
+              labelText: label,
+              enabledBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.black),
+              ),
+              focusedBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.black),
+              ),
+              contentPadding: const EdgeInsets.symmetric(vertical: 14),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildPasswordField() {
-    return TextField(
-      controller: _passwordController,
-      obscureText: _obscurePassword,
-      onChanged: (_) => setState(() {}),
-      decoration: InputDecoration(
-        labelText: "Password",
-        prefixIcon: Icon(Icons.lock),
-        suffixIcon: IconButton(
-          icon: Icon(
-              _obscurePassword ? Icons.visibility_off : Icons.visibility),
-          onPressed: () => setState(() {
-            _obscurePassword = !_obscurePassword;
-          }),
+    return Row(
+      children: [
+        const Icon(Icons.lock, color: Colors.grey),
+        const SizedBox(width: 8),
+        Expanded(
+          child: TextField(
+            controller: _passwordController,
+            obscureText: _obscurePassword,
+            onChanged: (_) => setState(() {}),
+            decoration: InputDecoration(
+              labelText: "Password",
+              enabledBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.black),
+              ),
+              focusedBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.black),
+              ),
+              contentPadding: const EdgeInsets.symmetric(vertical: 14),
+              suffixIcon: IconButton(
+                icon: Icon(
+                    _obscurePassword ? Icons.visibility_off : Icons.visibility),
+                onPressed: () => setState(() {
+                  _obscurePassword = !_obscurePassword;
+                }),
+              ),
+            ),
+          ),
         ),
-        border: OutlineInputBorder(),
-      ),
+      ],
     );
+  }
+
+  Future<void> _handleLogin(LoginViewModel viewModel) async {
+    await viewModel.login(
+      _urlController.text,
+      _usernameController.text,
+      _passwordController.text,
+    );
+
+    if (viewModel.errorMessage == null && viewModel.loginSuccess) {
+      Navigator.pushReplacementNamed(context, '/home-page');
+    } else if (viewModel.errorMessage != null) {
+      debugPrint('Login failed: ${viewModel.errorMessage}');
+    }
+  }
+
+  @override
+  void dispose() {
+    _urlController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }
