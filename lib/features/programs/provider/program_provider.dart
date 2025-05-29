@@ -14,6 +14,9 @@ class ProgramProvider extends ChangeNotifier {
       id: personId,
       fullName: "Angela Chezale",
       registrationDate: "13/05/2025",
+      dob: "",
+      sex: "",
+      updated: "",
       ownedBy: "Airwing Clinic (Zomba)",
     );
 

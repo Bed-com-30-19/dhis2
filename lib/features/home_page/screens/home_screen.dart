@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trackwise/features/programs/screen/personal_register_screen.dart';
 import '../../dhis2_service/dhis2_api_service.dart';
 import '../models/program_item.dart';
 import '../widgets/home_section_header.dart';
@@ -60,23 +61,34 @@ class _HomeScreenState extends State<HomeScreen> {
             )
           else
             Expanded(
-              child: ListView.builder(
-                itemCount: _programs.length,
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                itemBuilder: (context, index) {
-                  final program = _programs[index];
-                  return ProgramListItem(
-                    item: ProgramItem(
-                      icon: _getProgramIcon(program['programType']),
-                      title: program['name'] ?? program['id'],
-                      subtitle: program['programType'] ?? 'Program',
-                      date: 'Last updated', // You can add lastUpdated date if available
-                      iconColor: _getProgramColor(index),
+            child: ListView.builder(
+              itemCount: _programs.length,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              itemBuilder: (context, index) {
+                final program = _programs[index];
+                return ProgramListItem(
+                  item: ProgramItem(
+                    icon: _getProgramIcon(program['programType']),
+                    title: program['name'] ?? program['id'],
+                    subtitle: program['programType'] ?? 'Program',
+                    date: 'Last updated',
+                    iconColor: _getProgramColor(index),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PersonRegisterScreen(
+                        programId: program['id'],
+                        programName: program['name'] ?? program['id'],
+                      ),
                     ),
                   );
-                },
-              ),
+                  },
+                );
+              },
             ),
+          ),
         ],
       ),
     );

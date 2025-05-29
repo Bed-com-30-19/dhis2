@@ -72,7 +72,7 @@ class Dhis2ApiService {
 
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/api/programs/$programId/organisationUnits?fields=id,name,level&paging=false'),
+        Uri.parse('$baseUrl//api/programs/orgUnits?programs=$programId'),
         headers: {
           'Authorization': authToken,
           'Content-Type': 'application/json',
@@ -152,6 +152,79 @@ class Dhis2ApiService {
       }
     } catch (e) {
       throw Exception('Error fetching data elements: $e');
+    }
+  }
+
+  //get tei attributes
+  Future<Map<String, dynamic>> getPersonDetails(String personId) async {
+    final authData = await DataFromPrefs.getAuthData();
+    final baseUrl = authData['baseUrl'];
+    final authToken = authData['token'];
+    if (authToken == null) throw Exception('Not authenticated');
+
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/trackedEntityInstances/$personId'),
+        headers: {
+          'Authorization': authToken,
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        throw Exception('Failed to load person details: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching person details: $e');
+    }
+  }
+
+  // Add to Dhis2ApiService class
+  Future<List<Map<String, dynamic>>> getRegisteredPersons({
+    required String programId,
+    required String orgUnitId,
+    String? searchText,
+  }) async {
+    final authData = await DataFromPrefs.getAuthData();
+    final baseUrl = authData['baseUrl'];
+    final authToken = authData['token'];
+    
+    if (authToken == null) throw Exception('Not authenticated');
+    if (baseUrl == null) throw Exception('Base URL not configured');
+
+    try {
+      String url = '$baseUrl/api/trackedEntityInstances?'
+          'program=$programId&'
+          'ou=$orgUnitId&'
+          'ouMode=DESCENDANTS&'
+          'fields=trackedEntityInstance,orgUnit,attributes[attribute,value],'
+          'enrollments[enrollment,program,orgUnit,orgUnitName,enrollmentDate,status]';
+
+      if (searchText != null && searchText.isNotEmpty) {
+        url += '&query=$searchText';
+      }
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': authToken,
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['trackedEntityInstances'] != null) {
+          return List<Map<String, dynamic>>.from(data['trackedEntityInstances']);
+        }
+        return [];
+      } else {
+        throw Exception('Failed to load persons: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching persons: $e');
     }
   }
 }
