@@ -2,7 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class EventPopUpCard extends StatefulWidget {
-  const EventPopUpCard({super.key});
+  final String sectionTitle;
+  final String programStageId;
+  final String programId;
+  final String teiId;
+
+  const EventPopUpCard({
+    super.key,
+    required this.sectionTitle,
+    required this.programStageId,
+    required this.programId,
+    required this.teiId,
+  });
 
   @override
   State<EventPopUpCard> createState() => _EventPopUpCardState();
@@ -44,6 +55,7 @@ class _EventPopUpCardState extends State<EventPopUpCard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text(widget.sectionTitle, style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.green,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -51,7 +63,6 @@ class _EventPopUpCardState extends State<EventPopUpCard> {
             Navigator.of(context).pop();
           },
         ),
-        title: const Text('Vitals', style: TextStyle(color: Colors.white)),
         actions: [
           Center(
             child: Container(

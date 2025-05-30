@@ -252,4 +252,88 @@ class Dhis2ApiService {
       return false;
     }
   }
+
+  Future<List<Map<String, dynamic>>> getProgramStages(String programId) async {
+    final authData = await DataFromPrefs.getAuthData();
+    final baseUrl = authData['baseUrl'];
+    final authToken = authData['token'];
+
+    if (authToken == null) throw Exception('Not authenticated');
+    if (baseUrl == null) throw Exception('Base URL not configured');
+
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/programs/$programId?fields=programStages[id,name]'),
+        headers: {
+          'Authorization': authToken,
+          'Content-Type': 'application/json',
+        },
+      ).timeout(const Duration(seconds: 20));
+
+      print('=============================================================================================');
+      print('RESPONSE: ${response.body}');
+      print('=============================================================================================');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['programStages'] != null) {
+          return List<Map<String, dynamic>>.from(data['programStages']);
+        }
+        return [];
+      } else {
+        _lastErrorMessage = 'Failed to load program stages: ${response.statusCode} - ${response.body}';
+        throw Exception(_lastErrorMessage);
+      }
+    } catch (e) {
+      _lastErrorMessage = 'Error fetching program stages: $e';
+      throw Exception(_lastErrorMessage);
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getEventDataElements({
+    required String teiId,
+    required String programId,
+    required String programStageId,
+  }) async {
+    final authData = await DataFromPrefs.getAuthData();
+    final baseUrl = authData['baseUrl'];
+    final authToken = authData['token'];
+
+    if (authToken == null) throw Exception('Not authenticated');
+    if (baseUrl == null) throw Exception('Base URL not configured');
+
+    try {
+      final response = await http.get(
+        Uri.parse(
+          '$baseUrl/api/events?'
+          'trackedEntityInstance=$teiId&'
+          'program=$programId&'
+          'programStage=$programStageId&'
+          'fields=eventDate,dataValues[dataElement,value]'
+        ),
+        headers: {
+          'Authorization': authToken,
+          'Content-Type': 'application/json',
+        },
+      ).timeout(const Duration(seconds: 20));
+
+      print('=============================================================================================');
+      print('RESPONSE: ${response.body}');
+      print('=============================================================================================');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['events'] != null) {
+          return List<Map<String, dynamic>>.from(data['events']);
+        }
+        return [];
+      } else {
+        _lastErrorMessage = 'Failed to load event data elements: ${response.statusCode} - ${response.body}';
+        throw Exception(_lastErrorMessage);
+      }
+    } catch (e) {
+      _lastErrorMessage = 'Error fetching event data elements: $e';
+      throw Exception(_lastErrorMessage);
+    }
+  }
 }

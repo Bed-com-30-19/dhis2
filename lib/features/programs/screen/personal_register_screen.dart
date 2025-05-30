@@ -145,6 +145,7 @@ class _PersonRegisterScreenState extends State<PersonRegisterScreen> {
                       final person = provider.persons[index];
                       return PersonListItem(
                         person: _mapToPerson(person),
+                        programId: widget.programId,
                       );
                     },
                   );

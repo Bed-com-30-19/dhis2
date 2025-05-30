@@ -3,9 +3,15 @@ import '../entities/person.dart';
 import '../screen/program_stage_screen.dart';
 
 class PersonListItem extends StatelessWidget {
-  final Person person;
 
-  const PersonListItem({required this.person, super.key});
+  final Person person;
+  final String programId;
+
+  const PersonListItem({
+    required this.person,
+    required this.programId,
+    super.key
+    });
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +22,7 @@ class PersonListItem extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ProgramStageScreen(person: person),
+              builder: (context) => ProgramStageScreen(person: person, programId: programId,),
             ),
           );
         },

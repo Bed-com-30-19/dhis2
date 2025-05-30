@@ -11,9 +11,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _urlController = TextEditingController(text: 'https://project.ccdev.org/ictprojects');
-  final _usernameController = TextEditingController(text: 'finale_project');
-  final _passwordController = TextEditingController(text: 'Finale@24');
+  final _urlController = TextEditingController(text: 'https://');
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   bool get _isFormFilled =>

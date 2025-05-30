@@ -20,14 +20,41 @@ class ProgramListItem extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: onTap,
-        child: ListTile(
-          leading: CircleAvatar(
-            backgroundColor: item.iconColor.withOpacity(0.2),
-            child: Icon(item.icon, color: item.iconColor),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+            leading: CircleAvatar(
+              backgroundColor: item.iconColor.withOpacity(0.2),
+              radius: 22,
+              child: Icon(item.icon, color: item.iconColor, size: 20),
+            ),
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.title,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  item.subtitle,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Colors.grey[700],
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+            trailing: Text(
+              item.date,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Colors.grey,
+              ),
+            ),
           ),
-          title: Text(item.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-          subtitle: Text(item.subtitle),
-          trailing: Text(item.date, style: const TextStyle(color: Colors.grey)),
         ),
       ),
     );
