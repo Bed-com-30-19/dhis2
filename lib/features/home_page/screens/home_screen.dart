@@ -85,6 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           builder: (context) => PersonRegisterScreen(
                             programId: program['id'],
                             programName: program['name'] ?? program['id'],
+                            headerColor: _getProgramColor(index),
                           ),
                         ),
                       );

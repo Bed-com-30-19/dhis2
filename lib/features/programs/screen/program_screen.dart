@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../provider/program_provider.dart';
-import '../widgets/program_header.dart';
-import '../widgets/person_details_card.dart';
-import '../widgets/program_stage_list.dart';
 import '../widgets/bottom_nav_bar.dart';
+import '../widgets/person_details_card.dart';
+import '../widgets/program_header.dart';
+import '../widgets/program_stage_list.dart';
 
 class ProgramScreen extends StatefulWidget {
   final String personId;

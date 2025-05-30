@@ -6,6 +6,10 @@ class FilterHeader extends StatefulWidget {
   final String selectedProgram;
   final List<String> programs;
   final Function(String) onProgramChanged;
+  final String? selectedOrgUnit;
+  final List<String> orgUnits;
+  final Function(String?)? onOrgUnitChanged;
+  final Color headerColor;
 
   const FilterHeader({
     super.key,
@@ -14,6 +18,10 @@ class FilterHeader extends StatefulWidget {
     required this.selectedProgram,
     required this.programs,
     required this.onProgramChanged,
+    required this.headerColor, 
+    this.selectedOrgUnit,
+    this.orgUnits = const [],
+    this.onOrgUnitChanged,
   });
 
   @override
@@ -22,11 +30,13 @@ class FilterHeader extends StatefulWidget {
 
 class _FilterHeaderState extends State<FilterHeader> {
   late String _selectedProgram;
+  String? _selectedOrgUnit;
 
   @override
   void initState() {
     super.initState();
     _selectedProgram = widget.selectedProgram;
+    _selectedOrgUnit = widget.selectedOrgUnit;
   }
 
   void _showProgramDropdown(BuildContext context) {
@@ -49,37 +59,59 @@ class _FilterHeaderState extends State<FilterHeader> {
     );
   }
 
+  void _showOrgUnitDropdown(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) {
+        return ListView(
+          children: widget.orgUnits.map((orgUnit) {
+            return ListTile(
+              title: Text(orgUnit),
+              onTap: () {
+                setState(() => _selectedOrgUnit = orgUnit);
+                widget.onOrgUnitChanged?.call(orgUnit);
+                Navigator.of(context).pop();
+              },
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         // Top bar always visible
         Container(
-          color: Colors.green,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          color: widget.headerColor, 
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16), 
           child: Row(
             children: [
               IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+                onPressed: () => Navigator.of(context).pop(),
               ),
               const SizedBox(width: 8),
-              GestureDetector(
-                onTap: () => _showProgramDropdown(context),
-                child: Row(
-                  children: [
-                    Text(
-                      _selectedProgram,
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                    const SizedBox(width: 4),
-                    const Icon(Icons.arrow_drop_down, color: Colors.white),
-                  ],
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _showProgramDropdown(context),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _selectedProgram,
+                          style: const TextStyle(color: Colors.white, fontSize: 16),
+                          overflow: TextOverflow.ellipsis, 
+                        ),
+                      ),
+                      const Icon(Icons.arrow_drop_down, color: Colors.white),
+                    ],
+                  ),
                 ),
               ),
-              const Spacer(),
+              const SizedBox(width: 8),
               IconButton(
                 icon: const Icon(Icons.menu, color: Colors.white),
                 onPressed: widget.onToggle,
@@ -91,14 +123,14 @@ class _FilterHeaderState extends State<FilterHeader> {
         // Filters (expandable section)
         if (widget.isExpanded)
           Container(
-            color: Colors.green,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            color: widget.headerColor, 
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16), 
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildFilterItem(Icons.calendar_today, "EVENT DATE"),
                 _buildFilterItem(Icons.calendar_today, "DATE OF PERSON REGISTRATION"),
-                _buildFilterItem(Icons.apartment, "ORG. UNIT"),
+                _buildOrgUnitFilter(),
                 _buildFilterItem(Icons.sync, "SYNC"),
                 _buildFilterItem(Icons.verified_user, "ENROLLMENT STATUS"),
                 _buildFilterItem(Icons.event, "EVENT STATUS"),
@@ -117,9 +149,34 @@ class _FilterHeaderState extends State<FilterHeader> {
     );
   }
 
+  Widget _buildOrgUnitFilter() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0), // ✅ More breathing room
+      child: Row(
+        children: [
+          const Icon(Icons.apartment, color: Colors.white70),
+          const SizedBox(width: 10),
+          GestureDetector(
+            onTap: () => _showOrgUnitDropdown(context),
+            child: Row(
+              children: [
+                Text(
+                  _selectedOrgUnit ?? "ORG. UNIT",
+                  style: const TextStyle(color: Colors.white),
+                ),
+                const SizedBox(width: 4),
+                const Icon(Icons.arrow_drop_down, color: Colors.white),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildFilterItem(IconData icon, String label) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
           Icon(icon, color: Colors.white70),
@@ -132,7 +189,7 @@ class _FilterHeaderState extends State<FilterHeader> {
 
   Widget _buildFollowedToggle() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
           const Icon(Icons.notifications, color: Colors.white70),

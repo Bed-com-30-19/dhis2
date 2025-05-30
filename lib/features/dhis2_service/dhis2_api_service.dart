@@ -3,9 +3,11 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 import '../../core/data_from_prefs/data_from_prefs.dart';
+import '../programs/entities/tracked_entity_instance.dart';
 
 class Dhis2ApiService {
   String _lastErrorMessage = '';
+  String orgUnitId = "hrbAl7aUBwV";
 
   String get lastErrorMessage => _lastErrorMessage;
 
@@ -55,6 +57,9 @@ class Dhis2ApiService {
           'Content-Type': 'application/json',
         },
       ).timeout(const Duration(seconds: 20));
+      // print('==================================================');
+      // print('Response Body: ${response.body}');
+      // print('==================================================');
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -100,9 +105,8 @@ class Dhis2ApiService {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getRegisteredPersons({
+  Future<List<TrackedEntityInstance>> getRegisteredPersons({
     required String programId,
-    required String orgUnitId,
     String? searchText,
   }) async {
     final authData = await DataFromPrefs.getAuthData();
@@ -135,19 +139,19 @@ class Dhis2ApiService {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['trackedEntityInstances'] != null) {
-          return _transformTeiData(data['trackedEntityInstances']);
+          return (data['trackedEntityInstances'] as List)
+              .map((tei) => TrackedEntityInstance.fromJson(tei))
+              .toList();
         }
         return [];
       } else {
-        _lastErrorMessage = 'Failed to load persons: ${response.statusCode} - ${response.body}';
-        throw Exception(_lastErrorMessage);
+        throw Exception('Failed to load persons: ${response.statusCode}');
       }
     } catch (e) {
-      _lastErrorMessage = 'Error fetching persons: $e';
-      throw Exception(_lastErrorMessage);
+      throw Exception('Error fetching persons: $e');
     }
   }
-
+  
   List<Map<String, dynamic>> _transformTeiData(List<dynamic> teiList) {
     return teiList.map((tei) {
       final attributes = <String, dynamic>{};
