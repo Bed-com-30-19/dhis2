@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:trackwise/features/programs/screen/personal_register_screen.dart';
+
 import '../../dhis2_service/dhis2_api_service.dart';
+import '../../programs/screen/personal_register_screen.dart';
 import '../models/program_item.dart';
 import '../widgets/home_section_header.dart';
 import '../widgets/program_list_item.dart';
+import '../widgets/sider_bar_drawer.dart';
 
 class HomeScreen extends StatefulWidget {
+  //final String username; // Add username parameter
 
   const HomeScreen({super.key});
 
@@ -45,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      drawer: SidebarDrawer(username: "Arnold Muleke"),
       body: Column(
         children: [
           const HomeSectionHeader(),
@@ -57,38 +61,38 @@ class _HomeScreenState extends State<HomeScreen> {
                   _errorMessage!,
                   style: const TextStyle(color: Colors.red),
                 ),
-              ),
+              )
             )
           else
             Expanded(
-            child: ListView.builder(
-              itemCount: _programs.length,
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemBuilder: (context, index) {
-                final program = _programs[index];
-                return ProgramListItem(
-                  item: ProgramItem(
-                    icon: _getProgramIcon(program['programType']),
-                    title: program['name'] ?? program['id'],
-                    subtitle: program['programType'] ?? 'Program',
-                    date: 'Last updated',
-                    iconColor: _getProgramColor(index),
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PersonRegisterScreen(
-                        programId: program['id'],
-                        programName: program['name'] ?? program['id'],
-                      ),
+              child: ListView.builder(
+                itemCount: _programs.length,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                itemBuilder: (context, index) {
+                  final program = _programs[index];
+                  return ProgramListItem(
+                    item: ProgramItem(
+                      icon: _getProgramIcon(program['programType']),
+                      title: program['name'] ?? program['id'],
+                      subtitle: program['programType'] ?? 'Program',
+                      date: 'Last updated',
+                      iconColor: _getProgramColor(index),
                     ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PersonRegisterScreen(
+                            programId: program['id'],
+                            programName: program['name'] ?? program['id'],
+                          ),
+                        ),
+                      );
+                    },
                   );
-                  },
-                );
-              },
+                },
+              ),
             ),
-          ),
         ],
       ),
     );

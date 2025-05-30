@@ -41,13 +41,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [
-                          Icon(Icons.apps, size: 48, color: Colors.white),
+                          Icon(Icons.layers, size: 56, color: Colors.white),
                           SizedBox(width: 8),
                           Text("dhis2", style: TextStyle(color: Colors.white, fontSize: 24)),
                         ],
                       ),
                       const Padding(
-                        padding: EdgeInsets.only(left: 24.0, top: 8.0),
+                        padding: EdgeInsets.only(left: 240, top: 8.0),
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: Text("v3.1.1.1 : d496710a2", style: TextStyle(color: Colors.white70)),
